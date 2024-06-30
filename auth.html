@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AUTH | Pulse Music Store</title>
+    <!-- Load FontAwesome kit -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh; /* Mengatur tinggi container agar penuh layar */
+        }
+
+        .form_area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background-color: #EDDCD9;
+            padding: 30px;
+            border: 2px solid #264143;
+            border-radius: 20px;
+            box-shadow: 3px 4px 0px 1px #E99F4C;
+        }
+
+        .title {
+            color: #264143;
+            font-weight: 900;
+            font-size: 1.5em;
+            margin-bottom: 10px; /* Sesuaikan margin agar tidak terlalu rapat dengan "REGISTER" */
+        }
+
+        .form_group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* Sesuaikan agar label dan input berada di sejajar kiri */
+            margin-bottom: 15px;
+        }
+
+        .sub_title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            text-align: left; /* Tekstual label ke kiri */
+        }
+
+        .form_style {
+            outline: none;
+            border: 2px solid #264143;
+            box-shadow: 3px 4px 0px 1px #E99F4C;
+            width: 290px;
+            padding: 12px 10px;
+            border-radius: 4px;
+            font-size: 15px;
+            margin-top: 5px; /* Sesuaikan jarak antar elemen */
+        }
+
+        .btn {
+            padding: 15px;
+            margin-top: 20px; /* Sesuaikan margin agar tidak terlalu dekat dengan form */
+            margin-left: 160px;
+            width: 150px;
+            font-size: 15px;
+            background: #DE5499;
+            border-radius: 10px;
+            font-weight: 800;
+            box-shadow: 3px 3px 0px 0px #E99F4C;
+            cursor: pointer; /* Menunjukkan bahwa elemen dapat diklik */
+        }
+
+        .btn:hover {
+            opacity: .9;
+        }
+
+        .link {
+            font-weight: 800;
+            color: #264143;
+            padding: 5px;
+            text-decoration: none; /* Hapus garis bawah pada tautan */
+        }
+
+        .link:hover {
+            text-decoration: underline;
+        }
+
+        h4 {
+            font-weight: normal; /* Atau bisa diganti dengan 400 */
+            margin-bottom: 10px; /* Hapus margin default */
+            margin-top: 0;
+            text-align: left;
+        }
+        h3 {
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form_area">
+            <p class="title">Pulse Music Store <span class="fa-layers fa-fw"><i class="fas fa-music"></i></span></p>
+            <p class="register-title"><strong>TOKEN VERIFICATION</strong></p>
+            <h3>Here is your token!</h3>
+            <h4 id="tokenDisplay"></h4>
+            <form id="tokenForm" onsubmit="submitToken(event)">
+                <div class="form_group">
+                    <label class="sub_title" for="token">Token</label>
+                    <input placeholder="Enter your token" id="token" class="form_style" type="text" required>
+                </div>
+                <div>
+                    <button type="submit" class="btn">VERIFY ME</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function submitToken(event) {
+            event.preventDefault();
+            const token = document.getElementById('token').value;
+
+            // Here you can perform an AJAX request to send the token to the server
+            // Example using fetch API:
+            fetch('/verify-token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Invalid token');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Redirect user based on role or handle success response
+                if (data.role === 'admin') {
+                    window.location.href = '/admin-dashboard.html';
+                } else {
+                    window.location.href = '/user-dashboard.html';
+                }
+            })
+            .catch(error => {
+                console.error('Error verifying token:', error);
+                alert('Failed to verify token. Please try again.');
+            });
+        }
+    </script>
+</body>
+</html>

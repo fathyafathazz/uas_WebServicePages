@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REGISTER | Pulse Music Store</title>
+    <!-- Load FontAwesome kit -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh; /* Mengatur tinggi container agar penuh layar */
+        }
+
+        .form_area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background-color: #EDDCD9;
+            padding: 30px;
+            border: 2px solid #264143;
+            border-radius: 20px;
+            box-shadow: 3px 4px 0px 1px #E99F4C;
+        }
+
+        .title {
+            color: #264143;
+            font-weight: 900;
+            font-size: 1.5em;
+            margin-bottom: 10px; /* Sesuaikan margin agar tidak terlalu rapat dengan "REGISTER" */
+        }
+
+        .form_group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* Sesuaikan agar label dan input berada di sejajar kiri */
+            margin-bottom: 15px;
+        }
+
+        .sub_title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            text-align: left; /* Tekstual label ke kiri */
+        }
+
+        .form_style {
+            outline: none;
+            border: 2px solid #264143;
+            box-shadow: 3px 4px 0px 1px #E99F4C;
+            width: 290px;
+            padding: 12px 10px;
+            border-radius: 4px;
+            font-size: 15px;
+            margin-top: 5px; /* Sesuaikan jarak antar elemen */
+        }
+
+        .btn {
+            padding: 15px;
+            margin-top: 20px; /* Sesuaikan margin agar tidak terlalu dekat dengan form */
+            width: 315px;
+            font-size: 15px;
+            background: #DE5499;
+            border-radius: 10px;
+            font-weight: 800;
+            box-shadow: 3px 3px 0px 0px #E99F4C;
+            cursor: pointer; /* Menunjukkan bahwa elemen dapat diklik */
+        }
+
+        .btn:hover {
+            opacity: .9;
+        }
+
+        .link {
+            font-weight: 800;
+            color: #264143;
+            padding: 5px;
+            text-decoration: none; /* Hapus garis bawah pada tautan */
+        }
+
+        .link:hover {
+            text-decoration: underline;
+        }
+
+        h4 {
+            font-weight: normal; /* Atau bisa diganti dengan 400 */
+            margin-bottom: 10px; /* Hapus margin default */
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form_area">
+            <p class="title">Pulse Music<span class="fa-layers fa-fw"><i class="fas fa-music"></i></span></p>
+            <p class="register-title"><strong>REGISTER</strong></p>
+            <h4>create an account to get started!</h4> <!-- Menggunakan <strong> untuk teks REGISTER -->
+            <form id="registrationForm" onsubmit="submitRegistration(event)">
+                <div class="form_group">
+                    <label class="sub_title" for="username">Username</label>
+                    <input id="username" placeholder="Enter your Username here" class="form_style" type="text" required>
+                </div>
+                <div class="form_group">
+                    <label class="sub_title" for="password">Password</label>
+                    <input id="password" placeholder="Enter your password" class="form_style" type="password" required>
+                </div>
+                <div>
+                    <button type="submit" class="btn">REGISTER</button>
+                    <p>Have an Account? <a class="link" href="index.html">Login Here!</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>function submitRegistration(event) {
+        event.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+    
+        const registrationData = {
+            username: username,
+            password: password
+        };
+    
+        fetch('https://130.162.195.228/mhs714220012/register', { // Sesuaikan URL endpoint sesuai kebutuhan
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(registrationData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Registration Successful!',
+                    text: 'Please click OK to proceed to Login.',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = 'index.html'; // Redirect to login page
+                    }
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Registration Failed!',
+                    text: data.message || 'Please try again.'
+                });
+            }
+        })
+        .catch(error => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Registration Failed!',
+                text: error.message || 'Please try again.'
+            });
+        });
+    }</script>
+</body>
+</html>
