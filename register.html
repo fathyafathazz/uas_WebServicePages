@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="img/logo.png">
     <title>REGISTER | Pulse Music Store</title>
     <!-- Load FontAwesome kit -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -128,10 +129,10 @@
     
         const registrationData = {
             username: username,
-            password: password
+            password_hash: password
         };
     
-        fetch('https://130.162.195.228/mhs714220012/register', { // Sesuaikan URL endpoint sesuai kebutuhan
+        fetch('https://130.162.195.228/mhs714220012/regis', { // Sesuaikan URL endpoint sesuai kebutuhan
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

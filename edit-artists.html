@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="img/logo.png">
-    <title>ADD ARTISTS | Pulse Music</title>
+    <title>EDIT ARTIST | Pulse Music</title>
     <!-- Load FontAwesome kit -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
@@ -103,8 +103,8 @@
     <div class="container">
         <div class="form_area">
             <p class="title">Pulse Music <span class="fa-layers fa-fw"><i class="fas fa-music"></i></span></p>
-            <p class="register-title"><strong>ADD ARTIST</strong></p>
-            <h4>Add New Artist Here!</h4>
+            <p class="register-title"><strong>EDIT ARTIST</strong></p>
+            <h4>Edit Artist Here!</h4>
             <form id="artistForm">
                 <div class="form_group">
                     <label class="sub_title" for="artistName">Artist Name</label>
@@ -116,17 +116,27 @@
                 </div>
                 <div>
                     <button type="submit" id="submit-btn" class="btn">Submit</button>
+                    <p>Back To Artists List?<a class="link" href="artists.html">Click Here</a></p>
                 </div>
             </form>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     <script>
-        document.getElementById('artistForm').addEventListener('submit', function(event) {
-            event.preventDefault();
+        document.addEventListener('DOMContentLoaded', async () => {
+            const apiUrl = "https://130.162.195.228/mhs714220012/artists";
+            const artistForm = document.getElementById('artistForm');
+            const urlParams = new URLSearchParams(window.location.search);
+            const artistId = urlParams.get('id');
 
-            const artistName = document.getElementById('artistName').value;
-            const artistGenre = document.getElementById('artistGenre').value;
+            if (!artistId || isNaN(artistId)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Invalid artist ID provided.'
+                });
+                return;
+            }
 
             const token = localStorage.getItem('authToken');
 
@@ -139,40 +149,66 @@
                 return;
             }
 
-            console.log('Token:', token); // Untuk memastikan token benar
-
-            fetch('https://130.162.195.228/mhs714220012/artists', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ name: artistName, genre: artistGenre })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(data => { throw new Error(data.message || 'Unknown error'); });
-                }
-                return response.json();
-            })
-            .then(data => {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Artist added successfully',
-                    text: data.message,
-                    showConfirmButton: true
-                }).then(() => {
-                    window.location.href = 'artists.html'; // Redirect to the artists page
+            try {
+                const response = await fetch(`${apiUrl}/${artistId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
                 });
-                document.getElementById('artistForm').reset();
-            })
-            .catch(error => {
-                console.error('Error:', error);
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch artist details');
+                }
+
+                const artistData = await response.json();
+
+                document.getElementById('artistName').value = artistData.name || '';
+                document.getElementById('artistGenre').value = artistData.genre || '';
+            } catch (error) {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Failed to add artist',
+                    title: 'Error',
                     text: error.message
                 });
+            }
+
+            artistForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+
+                const artistName = document.getElementById('artistName').value;
+                const artistGenre = document.getElementById('artistGenre').value;
+
+                try {
+                    const response = await fetch(`${apiUrl}/${artistId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ name: artistName, genre: artistGenre })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to update artist');
+                    }
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Artist updated successfully',
+                        text: 'The artist details have been updated.',
+                        showConfirmButton: true
+                    }).then(() => {
+                        window.location.href = 'artists.html'; // Redirect to the artists page
+                    });
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: error.message
+                    });
+                }
             });
         });
     </script>
