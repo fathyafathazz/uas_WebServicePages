@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <link rel="icon" type="image/png" href="img/logo.png">
-    <title>Albums |Pulse Music</title>
+    <title>Albums | Pulse Music</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -19,7 +19,6 @@
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
 </head>
 <body id="page-top">
-
     <!-- Page Wrapper -->
     <div id="wrapper">
         <!-- Sidebar -->
@@ -201,6 +200,14 @@
                 const artistUrl = "https://130.162.195.228/mhs714220012/artists";
                 const token = document.cookie.split("; ").find(row => row.startsWith("token=")).split("=")[1];
 
+                function formatRupiah(angka) {
+                    const formatter = new Intl.NumberFormat('id-ID', {
+                        style: 'currency',
+                        currency: 'IDR'
+                    });
+                    return formatter.format(angka);
+                }
+
                 Promise.all([
                     fetch(apiUrl, {
                         headers: {
@@ -227,7 +234,7 @@
                             <td class="text-truncate">${album.title}</td>
                             <td class="text-truncate">${album.year}</td>
                             <td class="text-truncate">${artistName}</td>
-                            <td class="text-truncate">Rp. ${album.price.toLocaleString('id-ID')}</td>
+                            <td class="text-truncate">${formatRupiah(album.price)}</td>
                             <td class="text-truncate">
                                 <button class="btn btn-warning" onclick="window.location.href='edit-albums.html?id=${album.id}'">Edit</button> |
                                 <button class="btn btn-danger delete-btn" data-id="${album.id}">Delete</button>
@@ -245,6 +252,7 @@
                 })
                 .catch(error => {
                     console.error("There has been a problem with your fetch operation:", error);
+                    Swal.fire("Error!", "There has been a problem with your fetch operation.", "error");
                 });
 
                 // Function to delete an album
