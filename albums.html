@@ -200,7 +200,6 @@
                 const apiUrl = "https://130.162.195.228/mhs714220012/albums";
                 const artistUrl = "https://130.162.195.228/mhs714220012/artists";
                 const token = document.cookie.split("; ").find(row => row.startsWith("token=")).split("=")[1];
-                // const token = localStorage.getItem('authToken');
 
                 Promise.all([
                     fetch(apiUrl, {
@@ -228,10 +227,10 @@
                             <td class="text-truncate">${album.title}</td>
                             <td class="text-truncate">${album.year}</td>
                             <td class="text-truncate">${artistName}</td>
-                            <td class="text-truncate">${album.price}</td>
+                            <td class="text-truncate">Rp. ${album.price.toLocaleString('id-ID')}</td>
                             <td class="text-truncate">
-                                <button class="btn btn-warning" onclick="return window.location.href='./edit-albums.html?id=${album.title}'" >Edit</button> |
-                                <button class="btn btn-danger delete-btn" data-id="${album.title}">Delete</button>
+                                <button class="btn btn-warning" onclick="window.location.href='edit-albums.html?id=${album.id}'">Edit</button> |
+                                <button class="btn btn-danger delete-btn" data-id="${album.id}">Delete</button>
                             </td>
                         `;
                     });
@@ -239,8 +238,8 @@
                     // Add event listeners to delete buttons
                     document.querySelectorAll(".delete-btn").forEach(button => {
                         button.addEventListener("click", function() {
-                            const titleAlbum = this.getAttribute("data-id");
-                            deleteAlbum(titleAlbum);
+                            const albumId = this.getAttribute("data-id");
+                            deleteAlbum(albumId);
                         });
                     });
                 })
@@ -249,7 +248,7 @@
                 });
 
                 // Function to delete an album
-                function deleteAlbum(titleAlbum) {
+                function deleteAlbum(albumId) {
                     Swal.fire({
                         title: "Are you sure?",
                         text: "You won't be able to revert this!",
@@ -260,7 +259,7 @@
                         confirmButtonText: "Yes, delete it!"
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            fetch(`${apiUrl}/${titleAlbum}`, {
+                            fetch(`${apiUrl}/${albumId}`, {
                                 method: "DELETE",
                                 headers: {
                                     "Content-Type": "application/json",
@@ -276,7 +275,7 @@
                             .then(() => {
                                 Swal.fire("Deleted!", "Album has been deleted.", "success");
                                 // Remove the album row from the table
-                                document.querySelector(`button[data-id="${titleAlbum}"]`).closest("tr").remove();
+                                document.querySelector(`button[data-id="${albumId}"]`).closest("tr").remove();
                             })
                             .catch(error => {
                                 Swal.fire("Error!", "There has been a problem with your fetch operation.", "error");

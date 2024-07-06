@@ -200,7 +200,6 @@
                 const apiUrl = "https://130.162.195.228/mhs714220012/artists";
 
                 const token = document.cookie.split("; ").find(row => row.startsWith("token=")).split("=")[1];
-                // const token = localStorage.getItem('authToken');
 
                 // Fetch and display artists
                 fetch(apiUrl, {
@@ -223,7 +222,7 @@
                             <td class="text-truncate">${artist.name}</td>
                             <td class="text-truncate">${artist.genre}</td>
                             <td class="text-truncate">
-                                <button class="btn btn-warning" onclick="editArtist(${artist.id})">Edit</button> |
+                                <button class="btn btn-warning" onclick="window.location.href='edit-artists.html?id=${artist.id}'">Edit</button> |
                                 <button class="btn btn-danger delete-btn" data-id="${artist.id}">Delete</button>
                             </td>
                         `;
@@ -243,7 +242,6 @@
 
                 function deleteArtist(artistId) {
                     const apiUrl = "https://130.162.195.228/mhs714220012/artists";
-                    const token = localStorage.getItem('authToken');
 
                     Swal.fire({
                         title: "Are you sure?",
@@ -266,9 +264,6 @@
                                 if (!response.ok) {
                                     throw new Error("Network response was not ok");
                                 }
-                                return response.json();
-                            })
-                            .then(() => {
                                 Swal.fire("Deleted!", "Artist has been deleted.", "success");
                                 // Remove the artist row from the table
                                 document.querySelector(`button[data-id="${artistId}"]`).closest("tr").remove();
@@ -279,11 +274,6 @@
                             });
                         }
                     });
-                }
-
-                function editArtist(artistId) {
-                    // Redirect to edit page with artistId parameter
-                    window.location.href = `edit-artists.html?id=${artistId}`;
                 }
             });
         </script>

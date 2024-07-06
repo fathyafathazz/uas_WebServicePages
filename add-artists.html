@@ -129,7 +129,6 @@
             const artistGenre = document.getElementById('artistGenre').value;
 
             const token = document.cookie.split("; ").find(row => row.startsWith("token=")).split("=")[1];
-            // const token = localStorage.getItem('authToken');
 
             if (!token) {
                 Swal.fire({
