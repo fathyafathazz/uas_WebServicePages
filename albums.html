@@ -200,6 +200,7 @@
                 const apiUrl = "https://130.162.195.228/mhs714220012/albums";
                 const artistUrl = "https://130.162.195.228/mhs714220012/artists";
                 const token = document.cookie.split("; ").find(row => row.startsWith("token=")).split("=")[1];
+                // const token = localStorage.getItem('authToken');
 
                 Promise.all([
                     fetch(apiUrl, {

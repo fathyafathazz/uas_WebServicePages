@@ -128,7 +128,8 @@
             const artistName = document.getElementById('artistName').value;
             const artistGenre = document.getElementById('artistGenre').value;
 
-            const token = localStorage.getItem('authToken');
+            const token = document.cookie.split("; ").find(row => row.startsWith("token=")).split("=")[1];
+            // const token = localStorage.getItem('authToken');
 
             if (!token) {
                 Swal.fire({

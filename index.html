@@ -159,8 +159,8 @@
 
                 if (data.token) {
                     // Set token in cookie
-                    // document.cookie = `token=${data.token}; path=/;`;
-                    localStorage.setItem('authToken', data.token);
+                    document.cookie = `token=${data.token}; path=/;`;
+                    // localStorage.setItem('authToken', data.token);
 
                     Swal.fire({
                         icon: 'success',
