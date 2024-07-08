@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="img/logo.png">
-    <title>EDIT ARTIST | Pulse Music</title>
+    <title>EDIT ALBUM | Pulse Music</title>
     <!-- Load FontAwesome kit -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
@@ -103,42 +103,39 @@
     <div class="container">
         <div class="form_area">
             <p class="title">Pulse Music <span class="fa-layers fa-fw"><i class="fas fa-music"></i></span></p>
-            <p class="register-title"><strong>EDIT ARTIST</strong></p>
-            <h4>Edit Artist Here!</h4>
-            <form id="artistForm">
+            <p class="register-title"><strong>EDIT ALBUM</strong></p>
+            <h4>Edit Album Details Here!</h4>
+            <form id="albumForm">
                 <div class="form_group">
-                    <label class="sub_title" for="artistName">Artist Name</label>
-                    <input type="text" placeholder="Enter the Artist's Name" id="artistName" class="form_style" name="artistName" required>
+                    <label class="sub_title" for="title">Album Title</label>
+                    <input type="text" placeholder="Enter the Album's Title" id="title" class="form_style" name="title" required>
                 </div>
                 <div class="form_group">
-                    <label class="sub_title" for="artistGenre">Artist Genre</label>
-                    <input type="text" placeholder="Enter the Artist's Genre" id="artistGenre" class="form_style" name="artistGenre" required>
+                    <label class="sub_title" for="year">Year's Release</label>
+                    <input type="text" placeholder="Enter the Album's Year Release" id="year" class="form_style" name="year" required>
+                </div>
+                <div class="form_group">
+                    <label class="sub_title" for="artist_id">Artist Name</label>
+                    <select id="artist_id" class="form_style" name="artist_id" required>
+                        <option value="" disabled selected>Select Artist</option>
+                    </select>
+                </div>
+                <div class="form_group">
+                    <label class="sub_title" for="price">Album Price</label>
+                    <input type="text" placeholder="Enter the Album's Price" id="price" class="form_style" name="price" required>
                 </div>
                 <div>
                     <button type="submit" id="submit-btn" class="btn">Submit</button>
-                    <p>Back To Artists List?<a class="link" href="artists.html">Click Here</a></p>
                 </div>
             </form>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const apiUrl = "https://130.162.195.228/mhs714220012/artists";
-            const artistForm = document.getElementById('artistForm');
-            const urlParams = new URLSearchParams(window.location.search);
-            const artistId = urlParams.get('id');
-
-            if (!artistId || isNaN(artistId)) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Invalid artist ID provided.'
-                });
-                return;
-            }
-
+        document.addEventListener('DOMContentLoaded', async function() {
             const token = document.cookie.split("; ").find(row => row.startsWith("token=")).split("=")[1];
+            const urlParams = new URLSearchParams(window.location.search);
+            const albumId = urlParams.get('id');
 
             if (!token) {
                 Swal.fire({
@@ -150,22 +147,87 @@
             }
 
             try {
-                const response = await fetch(`${apiUrl}/${artistId}`, {
-                    method: 'GET',
+                // Fetch album details
+                const albumResponse = await fetch(`https://130.162.195.228/mhs714220012/albums/${albumId}`, {
                     headers: {
-                        'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     }
                 });
 
-                if (!response.ok) {
-                    throw new Error('Failed to fetch artist details');
+                if (!albumResponse.ok) {
+                    throw new Error('Failed to fetch album details');
                 }
 
-                const artistData = await response.json();
+                const albumData = await albumResponse.json();
+                document.getElementById('title').value = albumData.title;
+                document.getElementById('year').value = albumData.year;
+                document.getElementById('price').value = albumData.price;
 
-                document.getElementById('artistName').value = artistData.name || '';
-                document.getElementById('artistGenre').value = artistData.genre || '';
+                // Fetch artists list
+                const artistResponse = await fetch('https://130.162.195.228/mhs714220012/artists', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!artistResponse.ok) {
+                    throw new Error('Failed to fetch artists');
+                }
+
+                const artistsData = await artistResponse.json();
+                const artistSelect = document.getElementById('artist_id');
+
+                // Populate dropdown with artists
+                artistsData.forEach(artist => {
+                    const option = document.createElement('option');
+                    option.value = artist.id;
+                    option.textContent = artist.name;
+                    if (artist.id === albumData.artist_id) {
+                        option.selected = true;
+                    }
+                    artistSelect.appendChild(option);
+                });
+
+                // Handle form submission
+                document.getElementById('albumForm').addEventListener('submit', async function(event) {
+                    event.preventDefault();
+
+                    const title = document.getElementById('title').value;
+                    const year = parseInt(document.getElementById('year').value);  // Convert to integer
+                    const artist_id = parseInt(document.getElementById('artist_id').value);  // Convert to integer
+                    const price = parseInt(document.getElementById('price').value);  // Convert to integer
+
+                    const requestBody = { title, year, artist_id, price };
+
+                    try {
+                        const response = await fetch(`https://130.162.195.228/mhs714220012/albums/${albumId}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify(requestBody)
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('Failed to update album');
+                        }
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: 'Album updated successfully!'
+                        }).then(() => {
+                            window.location.href = 'albums.html';
+                        });
+                    } catch (error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: error.message
+                        });
+                    }
+                });
             } catch (error) {
                 Swal.fire({
                     icon: 'error',
@@ -173,43 +235,6 @@
                     text: error.message
                 });
             }
-
-            artistForm.addEventListener('submit', async (event) => {
-                event.preventDefault();
-
-                const artistName = document.getElementById('artistName').value;
-                const artistGenre = document.getElementById('artistGenre').value;
-
-                try {
-                    const response = await fetch(`${apiUrl}/${artistId}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        },
-                        body: JSON.stringify({ name: artistName, genre: artistGenre })
-                    });
-
-                    if (!response.ok) {
-                        throw new Error('Failed to update artist');
-                    }
-
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Artist updated successfully',
-                        text: 'The artist details have been updated.',
-                        showConfirmButton: true
-                    }).then(() => {
-                        window.location.href = 'artists.html'; // Redirect to the artists page
-                    });
-                } catch (error) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: error.message
-                    });
-                }
-            });
         });
     </script>
 </body>
